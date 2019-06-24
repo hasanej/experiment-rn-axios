@@ -1,65 +1,74 @@
 import React, { Component } from 'react';
 import { Container, Header, Content, Form, Item, Input, Button, Text, Label, Thumbnail } from 'native-base';
 
-import Headers from "./Headers.js"
+import Headers from "./Headers.js";
 
-export default class Addscreen extends Component {
-  constructor(props){
+export default class AddScreen extends Component {
+  constructor(props) {
     super(props);
 
     this.state = {
-      nama : "",
-      nomor : "",
-      email : ""
+      title: "",
+      author: "",
+      description: ""
     }
   }
 
-  handleName = (val) => {
+  handleTitle = (val) => {
     this.setState({
-      nama : val
-    })
+      title: val
+    });
   }
 
-  handleNomor = (val) => {
+  handleAuthor = (val) => {
     this.setState({
-      nomor : val
-    })
+      author: val
+    });
   }
 
-  handleEmail = (val) => {
+  handleDescription = (val) => {
     this.setState({
-      email : val
-    })
+      description: val
+    });
   }
 
   handlePostClick = () => {
-    const {nama,email,nomor} = this.state;
-    this.props.navigation.state.params.handlePostClick(nama,email,nomor)
+    const {title, author, description} = this.state;
+    this.props.navigation.state.params.handlePostClick(title, author, description);
     this.setState({
-      nama : "",
-      nomor : "",
-      email : ""
-    })
+      title: "",
+      author: "",
+      description: ""
+    });
   }
 
   render() {
     return (
       <Container>
-        <Headers navigation={this.props.navigation} handlePostClick={this.handlePostClick}/>
+        <Headers navigation={this.props.navigation} handlePostClick={this.handlePostClick} />
         <Content>
-          <Thumbnail style={{marginTop : 20,marginBottom:10, alignSelf:"center", backgroundColor:"#1e88e5"}} source={{uri: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0a/Gnome-stock_person.svg/1024px-Gnome-stock_person.svg.png"}} />
-          <Form style={{marginRight:20, marginLeft:5}}>
+          <Thumbnail
+            style={{
+              marginTop: 20,
+              marginBottom: 10,
+              alignSelf: "center",
+              backgroundColor: "#1E88E5"
+            }}
+            source={require('../assets/img/ic_books.png')} />
+          <Form style={{
+            marginRight:20,
+            marginLeft:5}} >
             <Item floatingLabel>
-              <Label>Nama</Label>
-              <Input value={this.state.nama} onChangeText={this.handleName} required/>
+              <Label>Title</Label>
+              <Input value={this.state.title} onChangeText={this.handleTitle} required />
             </Item>
             <Item floatingLabel>
-              <Label>Email</Label>
-              <Input value={this.state.email} onChangeText={this.handleEmail} required/>
+              <Label>Author</Label>
+              <Input value={this.state.author} onChangeText={this.handleAuthor} required />
             </Item>
             <Item floatingLabel>
-              <Label>Nomor</Label>
-              <Input value={this.state.nomor} onChangeText={this.handleNomor} required/>
+              <Label>Description</Label>
+              <Input value={this.state.description} onChangeText={this.handleDescription} required />
             </Item>
           </Form>
         </Content>
