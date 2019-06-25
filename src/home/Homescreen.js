@@ -1,44 +1,37 @@
-import React, {Component} from 'react';
-import {Alert,Platform, StyleSheet, View, StatusBar} from 'react-native';
-import {
-  Content,
-  Fab,
-  Button,
-  Icon,
-  Spinner,
-  ListItem,
-  Left,
-  Body,
-  Right,
-  Thumbnail,
-  Text } from "native-base"
+import React, { Component } from 'react';
+import { Alert,Platform, StyleSheet, View, StatusBar } from 'react-native';
+import { Content, Fab, Button, Icon, Spinner, ListItem, Left, Body, Right, Thumbnail, Text } from "native-base";
 import axios from "axios";
 
-import ListItems from "./component/ListItems"
+import ListItems from "./component/ListItems";
 
-export default class Homescreen extends Component {
+const baseUrl = "http://10.254.53.152:5000/app";
+
+export default class HomeScreen extends Component {
   constructor(props){
     super(props);
 
     this.state = {
-      data : [],
-      page : 1,
-      perpage : 7,
-      sort:1,
+      data: [],
+      page: 1,
+      perpage: 5,
+      sort: 1,
       loading: false
     }
   }
 
+  //Get all book
   makeRemoteRequest = () => {
-    const {page,perpage,sort} = this.state
-    this.setState({loading:true})
+    const {page, perpage, sort} = this.state
+    this.setState({loading:false})
+
     setTimeout(() => {
-      axios.get(`http://192.168.0.23:5000/contact/?page=${page}&perpage=${perpage}&sort=${sort}`)
+      axios.get(baseUrl + "?page=" + page + "&perpage=" + perpage + "&sort" + sort)
       .then(res => {
         const newData = this.state.data.concat(res.data);
         this.setState({
-          loading:false,
-          data : newData
+          loading: false,
+          data: newData
         })
       })
       .catch(err => {
@@ -51,15 +44,15 @@ export default class Homescreen extends Component {
     this.makeRemoteRequest()
   }
 
-
-  handlePostClick = (nama, email, nomor) => {
-    axios.post('http://192.168.0.23:5000/contact', {
-      nama,email,nomor
+  //Add book
+  handlePostClick = (title, author, description) => {
+    axios.post(baseUrl, {
+      title, author, description
     })
     .then((response) => {
       const newData = this.state.data.concat(response.data);
       this.setState({
-        data : newData
+        data: newData
       })
       this.props.navigation.popToTop()
     })
@@ -68,14 +61,15 @@ export default class Homescreen extends Component {
     });
   }
 
+  //Delete book
   handleDelete = (id, index) => {
-    axios.delete(`http://192.168.0.23:5000/contact/${id}`)
+    axios.delete(baseUrl + "/" + id)
     .then(res => {
       const newData = this.state.data.concat();
       newData.splice(index, 1);
 
       this.setState({
-        data : newData
+        data: newData
       })
     })
     .catch(err => {
@@ -83,13 +77,14 @@ export default class Homescreen extends Component {
     });
   }
 
-  handleEdit = (nama,email,nomor,id) => {
-    axios.put(`http://192.168.0.23:5000/contact/edit/${id}`, {
-      nama,email,nomor
+  //Edit book
+  handleEdit = (title, author, description, id) => {
+    axios.put(baseUrl + "/" + id, {
+      title, author, description
     })
     .then((response) => {
       this.setState({
-        data : response.data,
+        data: response.data,
       })
       this.props.navigation.popToTop()
     })
@@ -100,7 +95,7 @@ export default class Homescreen extends Component {
 
   handleLoadMore = () => {
     this.setState({
-      page : this.state.page + 1
+      page: this.state.page + 1
     }, () => {
       this.makeRemoteRequest()
     })
@@ -111,10 +106,8 @@ export default class Homescreen extends Component {
 
     return (
         <View>
-          <Spinner color='#1e88e5' />
-          <Text
-            style={{color:"#aaa", fontSize:12, textAlign:'center', bottom:10}}
-          >
+          <Spinner color='#1E88E5' />
+          <Text style={{color: "#AAA", fontSize: 12, textAlign: 'center', bottom: 10}} >
             Load more data
           </Text>
         </View>
@@ -124,19 +117,16 @@ export default class Homescreen extends Component {
   renderList = (item,index) => {
     return(
       <ListItem
-            style={{marginRight:20}}
+            style={{marginRight: 20}}
             avatar
             key={index}
-            onPress = {
-              () => this.props.navigation.navigate("Edit", {
-                                                            id : item._id,
-                                                            handleEdit : this.handleEdit
-                                                           }
-                                                  )
-            }
+            onPress={() => this.props.navigation.navigate("Edit", {
+                      id: item._id,
+                      handleEdit: this.handleEdit
+                    })}
             onLongPress={() => Alert.alert(
-              'Are you sure',
-              'you want to delete this contact ?',
+              'Confirmation',
+              'Delete this book?',
               [
                 {text: 'Cancel', onPress: () => null},
                 {text: 'OK', onPress: () => this.handleDelete(item._id, index)},
@@ -144,23 +134,23 @@ export default class Homescreen extends Component {
               { cancelable: false }
             )}>
             <Left>
-              <Thumbnail style={{backgroundColor:"#1e88e5"}} source={{ uri: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0a/Gnome-stock_person.svg/1024px-Gnome-stock_person.svg.png' }} />
+              <Thumbnail style={{backgroundColor:"#1E88E5"}} source={require('../assets/img/ic_books.png')} />
             </Left>
             <Body>
-              <Text>{item.nama}</Text>
-              <Text note>{item.email.toLowerCase()}</Text>
-              <Text note>{item.nomor}</Text>
+              <Text>{item.title}</Text>
+              <Text note>{item.author}</Text>
+              <Text note>{item.description}</Text>
             </Body>
           </ListItem>
     )
   }
 
   render() {
-    const {nama, email,nomor} = this.state
+    const {title, author, description} = this.state
     return (
       <View style={styles.container}>
         <StatusBar
-          backgroundColor="#1e88e5"
+          backgroundColor="#1E88E5"
           barStyle="light-content"
         />
 
@@ -177,12 +167,12 @@ export default class Homescreen extends Component {
         </View>
 
         <Fab
-            style={{ backgroundColor: '#1e88e5' }}
+            style={{backgroundColor: '#1E88E5'}}
             position="bottomRight"
             onPress={() => this.props.navigation.navigate("Add", {
-                                                                  handlePostClick:this.handlePostClick
-                                                                })}>
-            <Icon type="FontAwesome" name="pencil" />
+                      handlePostClick:this.handlePostClick
+                    })}>
+            <Icon type="FontAwesome" name="plus" />
         </Fab>
       </View>
     );

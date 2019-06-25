@@ -1,30 +1,33 @@
 import React, { Component } from 'react';
 import { Container, List, Left,Body,Right, Thumbnail,ListItem,Content, Form, Item, Input, Button, Text, Label } from 'native-base';
-import {FlatList} from "react-native"
-import Headers from "./Headers.js"
+import { FlatList } from "react-native";
 import axios from "axios"
 
-export default class Editscreen extends Component {
-  constructor(props){
+import Headers from "./Headers.js"
+
+const baseUrl = "http://10.254.53.152:5000/app";
+
+export default class EditScreen extends Component {
+  constructor(props) {
     super(props)
 
     this.state = {
-      data : [],
-      nama : "",
-      nomor : "",
-      email : ""
+      data: [],
+      title: "",
+      author: "",
+      description: ""
     }
   }
 
-  componentDidMount(){
-    axios.get(`http://192.168.0.23:5000/contact/edit/${this.props.navigation.state.params.id}`)
+  componentDidMount() {
+    axios.get(baseUrl + "/edit/" + this.props.navigation.state.params.id)
     .then(res => {
       const newData = this.state.data.concat(res.data);
       this.setState({
-        data : newData,
-        nama : res.data.nama,
-        nomor : res.data.nomor,
-        email : res.data.email
+        data: newData,
+        title: res.data.title,
+        author: res.data.author,
+        description: res.data.description
       })
     })
     .catch(err => {
@@ -32,31 +35,31 @@ export default class Editscreen extends Component {
     });
   }
 
-  handleName = (val) => {
+  handleTitle = (val) => {
     this.setState({
-      nama : val
+      title: val
     })
   }
 
-  handleNomor = (val) => {
+  handleAuthor = (val) => {
     this.setState({
-      nomor : val
+      author: val
     })
   }
 
-  handleEmail = (val) => {
+  handleDescription = (val) => {
     this.setState({
-      email : val
+      description: val
     })
   }
 
   handleEdit = (id) => {
-    const {nama,email,nomor} = this.state;
-    this.props.navigation.state.params.handleEdit(nama,email,nomor,id)
+    const {title, author, description} = this.state;
+    this.props.navigation.state.params.handleEdit(title, author, description, id)
     this.setState({
-      nama : "",
-      nomor : "",
-      email : ""
+      title: "",
+      author: "",
+      description: ""
     })
   }
 
@@ -64,44 +67,51 @@ export default class Editscreen extends Component {
     const {id} = this.props.navigation.state.params
     return (
       <Container>
-        <Headers navigation={this.props.navigation} handleEdit={this.handleEdit} id={id}/>
+        <Headers navigation={this.props.navigation} handleEdit={this.handleEdit} id={id} />
         <Content>
-          <List style={{marginTop:10}}>
+          <List style={{marginTop: 10}} >
           <FlatList
               data={this.state.data}
               keyExtractor={(item, index) => item._id}
               renderItem={({item, index}) => (
-                <ListItem
-                  style={{marginRight:20}}
-                  avatar
-                >
+                <ListItem style={{marginRight: 20}} avatar >
                   <Left>
-                    <Thumbnail style={{backgroundColor:"#1e88e5"}} source={{ uri: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0a/Gnome-stock_person.svg/1024px-Gnome-stock_person.svg.png' }} />
+                    <Thumbnail
+                      style={{backgroundColor:"#1E88E5"}}
+                      source={require('../assets/img/ic_books.png')} />
                   </Left>
                   <Body>
-                    <Text>{item.nama}</Text>
-                    <Text note>{item.email}</Text>
-                    <Text note>{item.nomor}</Text>
+                    <Text>{item.title}</Text>
+                    <Text note>{item.author}</Text>
+                    <Text note>{item.description}</Text>
                   </Body>
                 </ListItem>
               )}
             />
           </List>
 
-          <Text style={{alignSelf:"center", marginTop:20, marginBottom:20, color : "#aaa"}}>Fill the form to edit</Text>
+          <Text
+            style={{
+              alignSelf: "center",
+              marginTop: 20,
+              marginBottom: 20,
+              color: "#AAA"}}
+          >
+                Fill the form to edit
+          </Text>
 
-          <Form style={{marginRight:20, marginLeft:5}}>
+          <Form style={{marginRight: 20, marginLeft: 5}} >
             <Item stackedLabel>
-              <Label>Nama</Label>
-              <Input value={this.state.nama} onChangeText={this.handleName}/>
+              <Label>Title</Label>
+              <Input value={this.state.title} onChangeText={this.handleTitle}/>
             </Item>
             <Item stackedLabel>
-              <Label>Email</Label>
-              <Input value={this.state.email} onChangeText={this.handleEmail}/>
+              <Label>Author</Label>
+              <Input value={this.state.author} onChangeText={this.handleAuthor}/>
             </Item>
             <Item stackedLabel>
-              <Label>Nomor</Label>
-              <Input value={this.state.nomor} onChangeText={this.handleNomor}/>
+              <Label>Description</Label>
+              <Input value={this.state.description} onChangeText={this.handleDescription}/>
             </Item>
           </Form>
         </Content>
