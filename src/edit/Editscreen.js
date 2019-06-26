@@ -5,7 +5,7 @@ import axios from "axios"
 
 import Headers from "./Headers.js"
 
-const baseUrl = "http://10.254.53.152/app";
+const baseUrl = "http://10.254.53.152:5000/app";
 
 export default class EditScreen extends Component {
   constructor(props) {
