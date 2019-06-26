@@ -5,7 +5,7 @@ import axios from "axios";
 
 import ListItems from "./component/ListItems";
 
-const baseUrl = "http://192.168.43.161:5000/app";
+const baseUrl = "http://10.254.53.152:5000/app";
 
 //Realm
 var Realm = require('realm');
