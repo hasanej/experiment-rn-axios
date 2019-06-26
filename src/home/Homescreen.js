@@ -1,18 +1,34 @@
 import React, { Component } from 'react';
-import { Alert,Platform, StyleSheet, View, StatusBar } from 'react-native';
+import { Alert, Platform, StyleSheet, View, StatusBar, TouchableOpacity } from 'react-native';
 import { Content, Fab, Button, Icon, Spinner, ListItem, Left, Body, Right, Thumbnail, Text } from "native-base";
 import axios from "axios";
 
 import ListItems from "./component/ListItems";
 
-const baseUrl = "http://10.254.53.152:5000/app";
+const baseUrl = "http://192.168.43.161:5000/app";
+
+//Realm
+var Realm = require('realm');
+let realm;
+var realmDataObject;
 
 export default class HomeScreen extends Component {
   constructor(props){
     super(props);
 
+    realm = new Realm({
+      schema: [{name: 'Book_Catalogue',
+      properties: {
+        _id: 'string',
+        title: 'string',
+        author: 'string',
+        description: 'string'
+      }}]
+    });
+
     this.state = {
       data: [],
+      realmData: [],
       page: 1,
       perpage: 5,
       sort: 1,
@@ -22,8 +38,8 @@ export default class HomeScreen extends Component {
 
   //Get all book
   makeRemoteRequest = () => {
-    const {page, perpage, sort} = this.state
-    this.setState({loading:false})
+    const {page, perpage, sort} = this.state;
+    this.setState({loading: false});
 
     setTimeout(() => {
       axios.get(baseUrl + "?page=" + page + "&perpage=" + perpage + "&sort" + sort)
@@ -32,12 +48,67 @@ export default class HomeScreen extends Component {
         this.setState({
           loading: false,
           data: newData
-        })
+        });
+
+        //These data used to prevent duplicate data on Realm
+        realmDataObject = realm.objects('Book_Catalogue');
+        var totalDataServer = res.data.length;
+        var totalDataRealm = realmDataObject.length;
+
+        //Prevent duplicate data on Realm
+        if (totalDataServer > totalDataRealm) {
+          //Save each value to Realm
+          for (let index = 0; index < this.state.data.length; index++) {
+            realm.write(() => {
+              var ID = realm.objects('Book_Catalogue').length + 1;
+
+              realm.create('Book_Catalogue', {
+                _id: this.state.data[index]._id,
+                title: this.state.data[index].title,
+                author: this.state.data[index].author,
+                description: this.state.data[index].description
+              });
+            });
+          }
+        }
       })
       .catch(err => {
-        throw err;
+        // throw err;
+
+        realmDataObject = realm.objects('Book_Catalogue');
+        var realmDataArray = Object.keys(realmDataObject).map(i => realmDataObject[i]);
+
+        this.setState({
+          loading: false,
+          data: realmDataArray,
+        });
+
+        Alert.alert(
+          'Connection Failure',
+          'Failed getting data from server.',
+          [
+            {text: 'OK', onPress: () => null},
+          ],
+          { cancelable: false }
+        )
+      })
+      .finally(function () {
+
       });
     }, 1500)
+  }
+
+  saveToRealm = (item, index) => {
+    realm.write(() => {
+      var ID = realm.objects('Book_Catalogue').length + 1;
+
+       realm.create('Book_Catalogue', {
+         _id: ID,
+         title: item.title,
+         author: item.author,
+         description: item.description
+        });
+    });
   }
 
   componentDidMount(){
@@ -114,7 +185,7 @@ export default class HomeScreen extends Component {
     )
   }
 
-  renderList = (item,index) => {
+  renderList = (item, index) => {
     return(
       <ListItem
             style={{marginRight: 20}}
@@ -132,7 +203,7 @@ export default class HomeScreen extends Component {
                 {text: 'OK', onPress: () => this.handleDelete(item._id, index)},
               ],
               { cancelable: false }
-            )}>
+            )} >
             <Left>
               <Thumbnail style={{backgroundColor:"#1E88E5"}} source={require('../assets/img/ic_books.png')} />
             </Left>
@@ -141,7 +212,7 @@ export default class HomeScreen extends Component {
               <Text note>{item.author}</Text>
               <Text note>{item.description}</Text>
             </Body>
-          </ListItem>
+        </ListItem>
     )
   }
 
