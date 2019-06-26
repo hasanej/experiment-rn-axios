@@ -1,44 +1,44 @@
 import React, { Component } from "react";
-import { createStackNavigator } from "react-navigation";
+import { createStackNavigator, createAppContainer } from "react-navigation";
 
-import Homescreen from "../Home/Homescreen.js"
-import Addscreen from "../Add/Addscreen.js"
-import Editscreen from "../Edit/Editscreen.js"
+import HomeScreen from "../home/HomeScreen.js"
+import AddScreen from "../add/AddScreen.js"
+import EditScreen from "../edit/EditScreen.js"
 
-const Rootstack = createStackNavigator(
-	{
-		Home : {
-			screen : Homescreen,
-			navigationOptions: ({ navigation }) => ({
-		      title: "Contact List",
-		    }),
-		},
-		Add : {
-			screen : Addscreen,
-			navigationOptions: ({ navigation }) => ({
-		      header : null
-		    }),
-		},
-		Edit : {
-			screen : Editscreen,
-			navigationOptions: ({ navigation }) => ({
-		      header : null
-		    }),
-		}
+const Rootstack = createStackNavigator({
+	Home: {
+		screen: HomeScreen,
+		navigationOptions: ({ navigation }) => ({
+				title: "Book List",
+			}),
 	},
-	{
-    initialRouteName: 'Home',
-    navigationOptions: {
-      headerStyle: {
-        backgroundColor: '#1e88e5',
-      },
-      headerTintColor: '#fff',
-      headerTitleStyle: {
-        fontWeight: 'bold',
-        left : 107,
-      },
-    },
-  }
-)
+	Add: {
+		screen: AddScreen,
+		navigationOptions: ({ navigation }) => ({
+				header: null
+			}),
+	},
+	Edit: {
+		screen: EditScreen,
+		navigationOptions: ({ navigation }) => ({
+				header: null
+			}),
+	}
+},
+{
+	initialRouteName: 'Home',
+	navigationOptions: {
+		headerStyle: {
+			backgroundColor: '#1E88E5',
+		},
+		headerTintColor: '#FFF',
+		headerTitleStyle: {
+			fontWeight: 'bold',
+			left: 107,
+		},
+	},
+});
 
-export default Rootstack;
+const AppContainer = createAppContainer(Rootstack);
+
+export default AppContainer;
