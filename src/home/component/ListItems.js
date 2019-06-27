@@ -13,11 +13,11 @@ export default class ListItems extends Component {
       <List style={{marginTop: 10}}>
         <FlatList
           data={this.props.data}
-          keyExtractor={(item, index) => item._id}
+          keyExtractor={(item, index) => item.id_buku}
           ListFooterComponent={renderFooter()}
           onEndReached={handleLoadMore}
           onEndReachedThreshold={0.1}
-          renderItem={({item, index}) => renderList(item,index)}
+          renderItem={({item, index}) => renderList(item, index)}
         />
       </List>
     );

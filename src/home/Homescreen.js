@@ -5,7 +5,7 @@ import axios from "axios";
 
 import ListItems from "./component/ListItems";
 
-const baseUrl = "http://10.254.53.152:5000/app";
+const baseUrl = "http://10.254.53.152/katalog/api/Buku/";
 
 //Realm
 var Realm = require('realm');
@@ -19,7 +19,7 @@ export default class HomeScreen extends Component {
     realm = new Realm({
       schema: [{name: 'Book_Catalogue',
       properties: {
-        _id: 'string',
+        id_buku: {type: 'int', default: 0},
         title: 'string',
         author: 'string',
         description: 'string'
@@ -29,25 +29,20 @@ export default class HomeScreen extends Component {
     this.state = {
       data: [],
       realmData: [],
-      page: 1,
-      perpage: 5,
-      sort: 1,
       loading: false
     }
   }
 
   //Get all book
   makeRemoteRequest = () => {
-    const {page, perpage, sort} = this.state;
     this.setState({loading: false});
 
     setTimeout(() => {
-      axios.get(baseUrl + "?page=" + page + "&perpage=" + perpage + "&sort" + sort)
+      axios.get(baseUrl + "list_buku")
       .then(res => {
-        const newData = this.state.data.concat(res.data);
         this.setState({
           loading: false,
-          data: newData
+          data: res.data.Buku
         });
 
         //These data used to prevent duplicate data on Realm
@@ -63,10 +58,10 @@ export default class HomeScreen extends Component {
               var ID = realm.objects('Book_Catalogue').length + 1;
 
               realm.create('Book_Catalogue', {
-                _id: this.state.data[index]._id,
-                title: this.state.data[index].title,
-                author: this.state.data[index].author,
-                description: this.state.data[index].description
+                id_buku: ID,
+                title: this.state.data[index].judul_buku,
+                author: this.state.data[index].pengarang,
+                description: this.state.data[index].sinopsis_buku
               });
             });
           }
@@ -102,12 +97,12 @@ export default class HomeScreen extends Component {
     realm.write(() => {
       var ID = realm.objects('Book_Catalogue').length + 1;
 
-       realm.create('Book_Catalogue', {
-         _id: ID,
-         title: item.title,
-         author: item.author,
-         description: item.description
-        });
+      realm.create('Book_Catalogue', {
+        id_buku: ID,
+        title: item.title,
+        author: item.author,
+        description: item.description
+      });
     });
   }
 
@@ -117,15 +112,23 @@ export default class HomeScreen extends Component {
 
   //Add book
   handlePostClick = (title, author, description) => {
-    axios.post(baseUrl, {
-      title, author, description
+    var formData = new FormData();
+    formData.append('judul_buku', title);
+    formData.append('pengarang', author);
+    formData.append('sinopsis_buku', description);
+
+    axios({
+      method: 'post',
+      url: baseUrl + 'tambah_buku',
+      data: formData,
+      config: { headers: {'Content-Type': 'multipart/form-data' }}
     })
-    .then((response) => {
-      const newData = this.state.data.concat(response.data);
+    .then(res => {
       this.setState({
-        data: newData
+        data: res.data.Buku
       })
-      this.props.navigation.popToTop()
+      this.props.navigation.popToTop();
+      // this.props.navigation.navigate("Home");
     })
     .catch((error) => {
       throw error
@@ -188,31 +191,32 @@ export default class HomeScreen extends Component {
   renderList = (item, index) => {
     return(
       <ListItem
-            style={{marginRight: 20}}
-            avatar
-            key={index}
-            onPress={() => this.props.navigation.navigate("Edit", {
-                      id: item._id,
-                      handleEdit: this.handleEdit
-                    })}
-            onLongPress={() => Alert.alert(
-              'Confirmation',
-              'Delete this book?',
-              [
-                {text: 'Cancel', onPress: () => null},
-                {text: 'OK', onPress: () => this.handleDelete(item._id, index)},
-              ],
-              { cancelable: false }
-            )} >
-            <Left>
-              <Thumbnail style={{backgroundColor:"#1E88E5"}} source={require('../assets/img/ic_books.png')} />
-            </Left>
-            <Body>
-              <Text>{item.title}</Text>
-              <Text note>{item.author}</Text>
-              <Text note>{item.description}</Text>
-            </Body>
-        </ListItem>
+        style={{marginRight: 20}}
+        avatar
+        key={index}
+        onPress={() => this.props.navigation.navigate("Edit", {
+                  id: item.id_buku,
+                  handleEdit: this.handleEdit
+                })}
+        onLongPress={() => Alert.alert(
+          'Confirmation',
+          'Delete this book?',
+          [
+            {text: 'Cancel', onPress: () => null},
+            {text: 'OK', onPress: () => this.handleDelete(item.id_buku, index)},
+          ],
+          { cancelable: false }
+        )}
+      >
+        <Left>
+          <Thumbnail style={{backgroundColor:"#1E88E5"}} source={require('../assets/img/ic_books.png')} />
+        </Left>
+        <Body>
+          <Text>{item.judul_buku}</Text>
+          <Text note>{item.pengarang}</Text>
+          <Text note>{item.sinopsis_buku}</Text>
+        </Body>
+      </ListItem>
     )
   }
 
