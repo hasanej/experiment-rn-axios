@@ -13,7 +13,7 @@ let realm;
 var realmDataObject;
 
 export default class HomeScreen extends Component {
-  constructor(props){
+  constructor(props) {
     super(props);
 
     realm = new Realm({
@@ -121,8 +121,8 @@ export default class HomeScreen extends Component {
       method: 'post',
       url: baseUrl + 'tambah_buku',
       data: formData,
-      config: { headers: {'Content-Type': 'multipart/form-data' }}
     })
+    // axios.post(baseUrl + 'tambah_buku', { judul_buku: title, pengarang: author, sinopsis_buku: author })
     .then(res => {
       this.setState({
         data: res.data.Buku
@@ -137,7 +137,7 @@ export default class HomeScreen extends Component {
 
   //Delete book
   handleDelete = (id, index) => {
-    axios.delete(baseUrl + "/" + id)
+    axios.delete(baseUrl + 'delete_buku', { data: { id_buku: id } })
     .then(res => {
       const newData = this.state.data.concat();
       newData.splice(index, 1);
@@ -153,12 +153,23 @@ export default class HomeScreen extends Component {
 
   //Edit book
   handleEdit = (title, author, description, id) => {
-    axios.put(baseUrl + "/" + id, {
-      title, author, description
-    })
-    .then((response) => {
+    // var formData = new FormData();
+    // formData.append('id_buku', id);
+    // formData.append('judul_buku', title);
+    // formData.append('pengarang', author);
+    // formData.append('sinopsis_buku', description);
+
+    // axios({
+    //   method: 'put',
+    //   url: baseUrl + 'update_buku',
+    //   data: formData,
+    // })
+    axios.put(baseUrl + "update_buku", { data: {
+      id_buku: id, judul_buku: title, pengarang: author, sinopsis_buku: description
+    }})
+    .then(res => {
       this.setState({
-        data: response.data,
+        data: res.data.Buku,
       })
       this.props.navigation.popToTop()
     })
@@ -179,12 +190,12 @@ export default class HomeScreen extends Component {
     if(this.state.loading === false) return null;
 
     return (
-        <View>
-          <Spinner color='#1E88E5' />
-          <Text style={{color: "#AAA", fontSize: 12, textAlign: 'center', bottom: 10}} >
-            Load more data
-          </Text>
-        </View>
+      <View>
+        <Spinner color='#1E88E5' />
+        <Text style={{color: "#AAA", fontSize: 12, textAlign: 'center', bottom: 10}} >
+          Load more data
+        </Text>
+      </View>
     )
   }
 
@@ -196,6 +207,9 @@ export default class HomeScreen extends Component {
         key={index}
         onPress={() => this.props.navigation.navigate("Edit", {
                   id: item.id_buku,
+                  title: item.judul_buku,
+                  author: item.pengarang,
+                  description: item.sinopsis_buku,
                   handleEdit: this.handleEdit
                 })}
         onLongPress={() => Alert.alert(
@@ -209,7 +223,7 @@ export default class HomeScreen extends Component {
         )}
       >
         <Left>
-          <Thumbnail style={{backgroundColor:"#1E88E5"}} source={require('../assets/img/ic_books.png')} />
+          <Thumbnail style={{backgroundColor: "#1E88E5"}} source={require('../assets/img/ic_books.png')} />
         </Left>
         <Body>
           <Text>{item.judul_buku}</Text>
@@ -230,24 +244,23 @@ export default class HomeScreen extends Component {
         />
 
         <View style={{flex: 1}}>
-            <ListItems
-              {...this.props}
-              data={this.state.data}
-              handleDelete={this.handleDelete}
-              handleEdit={this.handleEdit}
-              handleLoadMore={this.handleLoadMore}
-              renderFooter={this.renderFooter}
-              renderList = {this.renderList}
-            />
+          <ListItems
+            {...this.props}
+            data={this.state.data}
+            handleDelete={this.handleDelete}
+            handleEdit={this.handleEdit}
+            handleLoadMore={this.handleLoadMore}
+            renderFooter={this.renderFooter}
+            renderList = {this.renderList}
+          />
         </View>
 
         <Fab
             style={{backgroundColor: '#1E88E5'}}
             position="bottomRight"
-            onPress={() => this.props.navigation.navigate("Add", {
-                      handlePostClick:this.handlePostClick
-                    })}>
-            <Icon type="FontAwesome" name="plus" />
+            onPress={() => this.props.navigation.navigate("Add", {handlePostClick: this.handlePostClick} )}
+        >
+          <Icon type="FontAwesome" name="plus" />
         </Fab>
       </View>
     );

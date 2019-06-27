@@ -1,11 +1,10 @@
 import React, { Component } from 'react';
-import { Container, List, Left,Body,Right, Thumbnail,ListItem,Content, Form, Item, Input, Button, Text, Label } from 'native-base';
-import { FlatList } from "react-native";
-import axios from "axios"
+import { Container, Left, Body, Right, Thumbnail, ListItem, Content, Form, Item, Input, Button, Text, Label } from 'native-base';
+import axios from "axios";
 
-import Headers from "./Headers.js"
+import Headers from "./Headers.js";
 
-const baseUrl = "http://10.254.53.152:5000/app";
+const baseUrl = "http://10.254.53.152/katalog/api/Buku/";
 
 export default class EditScreen extends Component {
   constructor(props) {
@@ -20,18 +19,10 @@ export default class EditScreen extends Component {
   }
 
   componentDidMount() {
-    axios.get(baseUrl + "/edit/" + this.props.navigation.state.params.id)
-    .then(res => {
-      const newData = this.state.data.concat(res.data);
-      this.setState({
-        data: newData,
-        title: res.data.title,
-        author: res.data.author,
-        description: res.data.description
-      })
-    })
-    .catch(err => {
-      throw err;
+    this.setState({
+      title: this.props.navigation.state.params.title,
+      author: this.props.navigation.state.params.author,
+      description: this.props.navigation.state.params.description
     });
   }
 
@@ -69,49 +60,32 @@ export default class EditScreen extends Component {
       <Container>
         <Headers navigation={this.props.navigation} handleEdit={this.handleEdit} id={id} />
         <Content>
-          <List style={{marginTop: 10}} >
-          <FlatList
-              data={this.state.data}
-              keyExtractor={(item, index) => item._id}
-              renderItem={({item, index}) => (
-                <ListItem style={{marginRight: 20}} avatar >
-                  <Left>
-                    <Thumbnail
-                      style={{backgroundColor:"#1E88E5"}}
-                      source={require('../assets/img/ic_books.png')} />
-                  </Left>
-                  <Body>
-                    <Text>{item.title}</Text>
-                    <Text note>{item.author}</Text>
-                    <Text note>{item.description}</Text>
-                  </Body>
-                </ListItem>
-              )}
-            />
-          </List>
+          <Thumbnail
+            style={{backgroundColor: "#1E88E5", marginTop: 10, marginBottom: 10, alignSelf: "center"}}
+            source={require('../assets/img/ic_books.png')}
+          />
+          <Body style={{marginStart: 15, marginEnd: 15}} >
+            <Text style={{alignSelf: "center"}} >{this.props.navigation.state.params.title}</Text>
+            <Text style={{alignSelf: "center"}} note >{this.props.navigation.state.params.author}</Text>
+            <Text style={{alignSelf: "flex-start", marginTop: 10}} note >{this.props.navigation.state.params.description}</Text>
+          </Body>
 
-          <Text
-            style={{
-              alignSelf: "center",
-              marginTop: 20,
-              marginBottom: 20,
-              color: "#AAA"}}
-          >
-                Fill the form to edit
+          <Text style={{alignSelf: "center", marginTop: 20, marginBottom: 20, color: "#AAA"}} >
+            Fill the form to edit
           </Text>
 
           <Form style={{marginRight: 20, marginLeft: 5}} >
             <Item stackedLabel>
               <Label>Title</Label>
-              <Input value={this.state.title} onChangeText={this.handleTitle}/>
+              <Input value={this.state.title} onChangeText={this.handleTitle} />
             </Item>
             <Item stackedLabel>
               <Label>Author</Label>
-              <Input value={this.state.author} onChangeText={this.handleAuthor}/>
+              <Input value={this.state.author} onChangeText={this.handleAuthor} />
             </Item>
             <Item stackedLabel>
               <Label>Description</Label>
-              <Input value={this.state.description} onChangeText={this.handleDescription}/>
+              <Input value={this.state.description} onChangeText={this.handleDescription} />
             </Item>
           </Form>
         </Content>
