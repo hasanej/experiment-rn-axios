@@ -39,15 +39,15 @@ export default class HomeScreen extends Component {
 
     setTimeout(() => {
       axios.get(baseUrl + "list_buku")
-      .then(res => {
+      .then(response => {
         this.setState({
           loading: false,
-          data: res.data.Buku
+          data: response.data.Buku
         });
 
         //These data used to prevent duplicate data on Realm
         realmDataObject = realm.objects('Book_Catalogue');
-        var totalDataServer = res.data.length;
+        var totalDataServer = response.data.length;
         var totalDataRealm = realmDataObject.length;
 
         //Prevent duplicate data on Realm
@@ -120,15 +120,11 @@ export default class HomeScreen extends Component {
     axios({
       method: 'post',
       url: baseUrl + 'tambah_buku',
-      data: formData,
+      data: formData
     })
-    // axios.post(baseUrl + 'tambah_buku', { judul_buku: title, pengarang: author, sinopsis_buku: author })
-    .then(res => {
-      this.setState({
-        data: res.data.Buku
-      })
+    .then(response => {
+      this.makeRemoteRequest();
       this.props.navigation.popToTop();
-      // this.props.navigation.navigate("Home");
     })
     .catch((error) => {
       throw error
@@ -153,24 +149,19 @@ export default class HomeScreen extends Component {
 
   //Edit book
   handleEdit = (title, author, description, id) => {
-    // var formData = new FormData();
-    // formData.append('id_buku', id);
-    // formData.append('judul_buku', title);
-    // formData.append('pengarang', author);
-    // formData.append('sinopsis_buku', description);
+    var formData = new FormData();
+    formData.append('id_buku', id);
+    formData.append('judul_buku', title);
+    formData.append('pengarang', author);
+    formData.append('sinopsis_buku', description);
 
-    // axios({
-    //   method: 'put',
-    //   url: baseUrl + 'update_buku',
-    //   data: formData,
-    // })
-    axios.put(baseUrl + "update_buku", { data: {
-      id_buku: id, judul_buku: title, pengarang: author, sinopsis_buku: description
-    }})
-    .then(res => {
-      this.setState({
-        data: res.data.Buku,
-      })
+    axios({
+      method: 'post',
+      url: baseUrl + 'update_buku',
+      data: formData
+    })
+    .then(response => {
+      this.makeRemoteRequest();
       this.props.navigation.popToTop()
     })
     .catch((error) => {
