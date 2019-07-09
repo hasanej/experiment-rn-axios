@@ -5,7 +5,7 @@ import axios from "axios";
 
 import ListItems from "./component/ListItems";
 
-const baseUrl = "http://10.254.53.152/katalog/api/Buku/";
+const baseUrl = "http://10.254.55.236/katalog/api/Buku/";
 
 //Realm
 var Realm = require('realm');
@@ -19,7 +19,7 @@ export default class HomeScreen extends Component {
     realm = new Realm({
       schema: [{name: 'Book_Catalogue',
       properties: {
-        id_buku: {type: 'int', default: 0},
+        id_buku: 'string',
         title: 'string',
         author: 'string',
         description: 'string'
@@ -55,10 +55,8 @@ export default class HomeScreen extends Component {
           //Save each value to Realm
           for (let index = 0; index < this.state.data.length; index++) {
             realm.write(() => {
-              var ID = realm.objects('Book_Catalogue').length + 1;
-
               realm.create('Book_Catalogue', {
-                id_buku: ID,
+                id_buku: this.state.data[index].id_buku,
                 title: this.state.data[index].judul_buku,
                 author: this.state.data[index].pengarang,
                 description: this.state.data[index].sinopsis_buku
@@ -93,18 +91,18 @@ export default class HomeScreen extends Component {
     }, 1500)
   }
 
-  saveToRealm = (item, index) => {
-    realm.write(() => {
-      var ID = realm.objects('Book_Catalogue').length + 1;
+  // saveToRealm = (item, index) => {
+  //   realm.write(() => {
+  //     var ID = realm.objects('Book_Catalogue').length + 1;
 
-      realm.create('Book_Catalogue', {
-        id_buku: ID,
-        title: item.title,
-        author: item.author,
-        description: item.description
-      });
-    });
-  }
+  //     realm.create('Book_Catalogue', {
+  //       id_buku: ID,
+  //       title: item.title,
+  //       author: item.author,
+  //       description: item.description
+  //     });
+  //   });
+  // }
 
   componentDidMount(){
     this.makeRemoteRequest()
@@ -133,17 +131,19 @@ export default class HomeScreen extends Component {
 
   //Delete book
   handleDelete = (id, index) => {
-    axios.delete(baseUrl + 'delete_buku', { data: { id_buku: id } })
-    .then(res => {
-      const newData = this.state.data.concat();
-      newData.splice(index, 1);
+    var formData = new FormData();
+    formData.append('id_buku', id);
 
-      this.setState({
-        data: newData
-      })
+    axios({
+      method: 'post',
+      url: baseUrl + 'delete_buku',
+      data: formData
     })
-    .catch(err => {
-      throw err;
+    .then(response => {
+      this.makeRemoteRequest();
+    })
+    .catch((error) => {
+      throw error
     });
   }
 

@@ -4,7 +4,7 @@ import axios from "axios";
 
 import Headers from "./Headers.js";
 
-const baseUrl = "http://10.254.53.152/katalog/api/Buku/";
+const baseUrl = "http://10.254.55.236/katalog/api/Buku/";
 
 export default class EditScreen extends Component {
   constructor(props) {
