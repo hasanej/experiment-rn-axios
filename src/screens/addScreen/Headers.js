@@ -1,20 +1,22 @@
 import React, { Component } from 'react';
 import { Container, Header, Left, Body, Right, Button, Icon, Title, Text } from 'native-base';
-import { TouchableOpacity } from "react-native"
+import { TouchableOpacity } from "react-native";
+
+import styles from "./styles";
 
 const Headers = ({navigation, handlePostClick}) => (
-  <Header style={{backgroundColor: "#1E88E5"}} androidStatusBarColor="#1E88E5" >
+  <Header style={styles.header} androidStatusBarColor="#1E88E5" >
     <Left>
       <Button transparent onPress={() => navigation.pop()} >
-        <Icon name='arrow-back' />
+        <Icon style={styles.buttonBack} name='arrow-back' />
       </Button>
     </Left>
-    <Body style={{left: 60}}>
+    <Body>
       <Title>Add Book</Title>
     </Body>
     <Right>
       <TouchableOpacity onPress={() => handlePostClick()}>
-        <Text style={{color: "#FFF", top: 1, marginRight: 10}}>Done</Text>
+        <Text style={styles.buttonDone}>Done</Text>
       </TouchableOpacity>
     </Right>
   </Header>
