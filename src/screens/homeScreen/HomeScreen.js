@@ -4,8 +4,9 @@ import { Content, Fab, Button, Icon, Spinner, ListItem, Left, Body, Right, Thumb
 import axios from "axios";
 
 import ListItems from "./component/ListItems";
+import styles from "./styles";
 
-const baseUrl = "http://10.254.55.236/katalog/api/Buku/";
+const baseUrl = "http://192.168.1.123/katalog/api/Buku/";
 
 //Realm
 var Realm = require('realm');
@@ -20,9 +21,9 @@ export default class HomeScreen extends Component {
       schema: [{name: 'Book_Catalogue',
       properties: {
         id_buku: 'string',
-        title: 'string',
-        author: 'string',
-        description: 'string'
+        judul_buku: 'string',
+        pengarang: 'string',
+        sinopsis_buku: 'string'
       }}]
     });
 
@@ -50,19 +51,16 @@ export default class HomeScreen extends Component {
         var totalDataServer = response.data.length;
         var totalDataRealm = realmDataObject.length;
 
-        //Prevent duplicate data on Realm
-        if (totalDataServer > totalDataRealm) {
-          //Save each value to Realm
-          for (let index = 0; index < this.state.data.length; index++) {
-            realm.write(() => {
-              realm.create('Book_Catalogue', {
-                id_buku: this.state.data[index].id_buku,
-                title: this.state.data[index].judul_buku,
-                author: this.state.data[index].pengarang,
-                description: this.state.data[index].sinopsis_buku
-              });
+        //Save each value to Realm
+        for (let index = 0; index < this.state.data.length; index++) {
+          realm.write(() => {
+            realm.create('Book_Catalogue', {
+              id_buku: this.state.data[index].id_buku,
+              judul_buku: this.state.data[index].judul_buku,
+              pengarang: this.state.data[index].pengarang,
+              sinopsis_buku: this.state.data[index].sinopsis_buku
             });
-          }
+          });
         }
       })
       .catch(err => {
@@ -70,6 +68,15 @@ export default class HomeScreen extends Component {
 
         realmDataObject = realm.objects('Book_Catalogue');
         var realmDataArray = Object.keys(realmDataObject).map(i => realmDataObject[i]);
+
+        // Alert.alert(
+        //   'Connection Failure',
+        //   JSON.stringify(realmDataArray),
+        //   [
+        //     {text: 'OK', onPress: () => null},
+        //   ],
+        //   { cancelable: false }
+        // )
 
         this.setState({
           loading: false,
@@ -170,11 +177,11 @@ export default class HomeScreen extends Component {
   }
 
   handleLoadMore = () => {
-    this.setState({
-      page: this.state.page + 1
-    }, () => {
-      this.makeRemoteRequest()
-    })
+    // this.setState({
+    //   page: this.state.page + 1
+    // }, () => {
+    //   this.makeRemoteRequest()
+    // })
   }
 
   renderFooter = () => {
@@ -183,7 +190,7 @@ export default class HomeScreen extends Component {
     return (
       <View>
         <Spinner color='#1E88E5' />
-        <Text style={{color: "#AAA", fontSize: 12, textAlign: 'center', bottom: 10}} >
+        <Text style={styles.text} >
           Load more data
         </Text>
       </View>
@@ -193,7 +200,7 @@ export default class HomeScreen extends Component {
   renderList = (item, index) => {
     return(
       <ListItem
-        style={{marginRight: 20}}
+        style={styles.listItem}
         avatar
         key={index}
         onPress={() => this.props.navigation.navigate("Edit", {
@@ -214,7 +221,7 @@ export default class HomeScreen extends Component {
         )}
       >
         <Left>
-          <Thumbnail style={{backgroundColor: "#1E88E5"}} source={require('../assets/img/ic_books.png')} />
+          <Thumbnail style={styles.thumbnail} source={require('../../assets/img/ic_books.png')} />
         </Left>
         <Body>
           <Text>{item.judul_buku}</Text>
@@ -234,7 +241,7 @@ export default class HomeScreen extends Component {
           barStyle="light-content"
         />
 
-        <View style={{flex: 1}}>
+        <View style={styles.view}>
           <ListItems
             {...this.props}
             data={this.state.data}
@@ -247,7 +254,7 @@ export default class HomeScreen extends Component {
         </View>
 
         <Fab
-            style={{backgroundColor: '#1E88E5'}}
+            style={styles.fab}
             position="bottomRight"
             onPress={() => this.props.navigation.navigate("Add", {handlePostClick: this.handlePostClick} )}
         >
@@ -257,10 +264,3 @@ export default class HomeScreen extends Component {
     );
   }
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#F5FCFF',
-  }
-});
