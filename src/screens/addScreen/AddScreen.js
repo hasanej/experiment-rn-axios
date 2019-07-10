@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import { Container, Header, Content, Form, Item, Input, Button, Text, Label, Thumbnail } from 'native-base';
 
-import Headers from "./Headers.js";
+import Headers from "./Headers";
+import styles from "./styles";
 
 export default class AddScreen extends Component {
   constructor(props) {
@@ -47,17 +48,8 @@ export default class AddScreen extends Component {
       <Container>
         <Headers navigation={this.props.navigation} handlePostClick={this.handlePostClick} />
         <Content>
-          <Thumbnail
-            style={{
-              marginTop: 20,
-              marginBottom: 10,
-              alignSelf: "center",
-              backgroundColor: "#1E88E5"
-            }}
-            source={require('../assets/img/ic_books.png')} />
-          <Form style={{
-            marginRight:20,
-            marginLeft:5}} >
+          <Thumbnail style={styles.thumbnail} source={require('../../assets/img/ic_books.png')} />
+          <Form style={styles.form} >
             <Item floatingLabel>
               <Label>Title</Label>
               <Input value={this.state.title} onChangeText={this.handleTitle} required />

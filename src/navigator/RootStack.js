@@ -1,9 +1,9 @@
 import React, { Component } from "react";
 import { createStackNavigator, createAppContainer } from "react-navigation";
 
-import HomeScreen from "../home/HomeScreen.js"
-import AddScreen from "../add/AddScreen.js"
-import EditScreen from "../edit/EditScreen.js"
+import HomeScreen from "../screens/homeScreen/HomeScreen";
+import AddScreen from "../screens/addScreen/AddScreen";
+import EditScreen from "../screens/editScreen/EditScreen";
 
 const Rootstack = createStackNavigator({
 	Home: {
