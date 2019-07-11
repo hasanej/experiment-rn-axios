@@ -5,7 +5,7 @@ import axios from "axios";
 import Headers from "./Headers";
 import styles from "./styles";
 
-const baseUrl = "http://192.168.1.123/katalog/api/Buku/";
+const baseUrl = "http://192.168.1.123/book-catalogue/api/book/";
 
 export default class EditScreen extends Component {
   constructor(props) {
@@ -15,7 +15,7 @@ export default class EditScreen extends Component {
       data: [],
       title: "",
       author: "",
-      description: ""
+      synopsis: ""
     }
   }
 
@@ -23,7 +23,7 @@ export default class EditScreen extends Component {
     this.setState({
       title: this.props.navigation.state.params.title,
       author: this.props.navigation.state.params.author,
-      description: this.props.navigation.state.params.description
+      synopsis: this.props.navigation.state.params.synopsis
     });
   }
 
@@ -39,19 +39,19 @@ export default class EditScreen extends Component {
     })
   }
 
-  handleDescription = (val) => {
+  handleSynopsis = (val) => {
     this.setState({
-      description: val
+      synopsis: val
     })
   }
 
   handleEdit = (id) => {
-    const {title, author, description} = this.state;
-    this.props.navigation.state.params.handleEdit(title, author, description, id)
+    const {title, author, synopsis} = this.state;
+    this.props.navigation.state.params.handleEdit(title, author, synopsis, id)
     this.setState({
       title: "",
       author: "",
-      description: ""
+      synopsis: ""
     })
   }
 
@@ -68,7 +68,7 @@ export default class EditScreen extends Component {
           <Body style={styles.body} >
             <Text style={styles.bookTitle} >{this.props.navigation.state.params.title}</Text>
             <Text style={styles.bookAuthor} note >{this.props.navigation.state.params.author}</Text>
-            <Text style={styles.bookDescription} note >{this.props.navigation.state.params.description}</Text>
+            <Text style={styles.bookSynopsis} note >{this.props.navigation.state.params.synopsis}</Text>
           </Body>
 
           <Text style={styles.caption} >
@@ -85,8 +85,8 @@ export default class EditScreen extends Component {
               <Input value={this.state.author} onChangeText={this.handleAuthor} />
             </Item>
             <Item stackedLabel>
-              <Label>Description</Label>
-              <Input value={this.state.description} onChangeText={this.handleDescription} />
+              <Label>Synopsis</Label>
+              <Input value={this.state.synopsis} onChangeText={this.handleSynopsis} />
             </Item>
           </Form>
         </Content>
