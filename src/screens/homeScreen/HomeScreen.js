@@ -6,7 +6,7 @@ import axios from "axios";
 import ListItems from "./component/ListItems";
 import styles from "./styles";
 
-const baseUrl = "http://192.168.1.123/katalog/api/Buku/";
+const baseUrl = "http://192.168.1.123/book-catalogue/api/book/";
 
 //Realm
 var Realm = require('realm');
@@ -18,13 +18,16 @@ export default class HomeScreen extends Component {
     super(props);
 
     realm = new Realm({
-      schema: [{name: 'Book_Catalogue',
-      properties: {
-        id_buku: 'string',
-        judul_buku: 'string',
-        pengarang: 'string',
-        sinopsis_buku: 'string'
-      }}]
+      schema: [{
+        name: 'Book_Catalogue',
+        primaryKey: 'id',
+        properties: {
+          id: 'string',
+          title: 'string',
+          author: 'string',
+          synopsis: 'string'
+        }
+      }]
     });
 
     this.state = {
@@ -34,16 +37,20 @@ export default class HomeScreen extends Component {
     }
   }
 
+  componentDidMount(){
+    this.makeRemoteRequest()
+  }
+
   //Get all book
   makeRemoteRequest = () => {
     this.setState({loading: false});
 
     setTimeout(() => {
-      axios.get(baseUrl + "list_buku")
+      axios.get(baseUrl + "get_book")
       .then(response => {
         this.setState({
           loading: false,
-          data: response.data.Buku
+          data: response.data.book
         });
 
         //These data used to prevent duplicate data on Realm
@@ -52,19 +59,23 @@ export default class HomeScreen extends Component {
         var totalDataRealm = realmDataObject.length;
 
         //Save each value to Realm
-        for (let index = 0; index < this.state.data.length; index++) {
-          realm.write(() => {
+        // for (let index = 0; index < this.state.data.length; index++) {
+
+        realm.write(() => {
+          for (let index = 0; index < this.state.data.length; index++) {
             realm.create('Book_Catalogue', {
-              id_buku: this.state.data[index].id_buku,
-              judul_buku: this.state.data[index].judul_buku,
-              pengarang: this.state.data[index].pengarang,
-              sinopsis_buku: this.state.data[index].sinopsis_buku
+              id: this.state.data[index].id,
+              title: this.state.data[index].title,
+              author: this.state.data[index].author,
+              synopsis: this.state.data[index].synopsis
             });
-          });
-        }
+          }
+        });
+
+        // }
       })
       .catch(err => {
-        // throw err;
+        throw err;
 
         realmDataObject = realm.objects('Book_Catalogue');
         var realmDataArray = Object.keys(realmDataObject).map(i => realmDataObject[i]);
@@ -103,28 +114,24 @@ export default class HomeScreen extends Component {
   //     var ID = realm.objects('Book_Catalogue').length + 1;
 
   //     realm.create('Book_Catalogue', {
-  //       id_buku: ID,
+  //       id: ID,
   //       title: item.title,
   //       author: item.author,
-  //       description: item.description
+  //       synopsis: item.synopsis
   //     });
   //   });
   // }
 
-  componentDidMount(){
-    this.makeRemoteRequest()
-  }
-
   //Add book
-  handlePostClick = (title, author, description) => {
+  handlePostClick = (title, author, synopsis) => {
     var formData = new FormData();
-    formData.append('judul_buku', title);
-    formData.append('pengarang', author);
-    formData.append('sinopsis_buku', description);
+    formData.append('title', title);
+    formData.append('author', author);
+    formData.append('synopsis', synopsis);
 
     axios({
       method: 'post',
-      url: baseUrl + 'tambah_buku',
+      url: baseUrl + 'add_book',
       data: formData
     })
     .then(response => {
@@ -139,11 +146,11 @@ export default class HomeScreen extends Component {
   //Delete book
   handleDelete = (id, index) => {
     var formData = new FormData();
-    formData.append('id_buku', id);
+    formData.append('id', id);
 
     axios({
       method: 'post',
-      url: baseUrl + 'delete_buku',
+      url: baseUrl + 'delete_book',
       data: formData
     })
     .then(response => {
@@ -155,16 +162,16 @@ export default class HomeScreen extends Component {
   }
 
   //Edit book
-  handleEdit = (title, author, description, id) => {
+  handleEdit = (title, author, synopsis, id) => {
     var formData = new FormData();
-    formData.append('id_buku', id);
-    formData.append('judul_buku', title);
-    formData.append('pengarang', author);
-    formData.append('sinopsis_buku', description);
+    formData.append('id', id);
+    formData.append('title', title);
+    formData.append('author', author);
+    formData.append('synopsis', synopsis);
 
     axios({
       method: 'post',
-      url: baseUrl + 'update_buku',
+      url: baseUrl + 'update_book',
       data: formData
     })
     .then(response => {
@@ -204,10 +211,10 @@ export default class HomeScreen extends Component {
         avatar
         key={index}
         onPress={() => this.props.navigation.navigate("Edit", {
-                  id: item.id_buku,
-                  title: item.judul_buku,
-                  author: item.pengarang,
-                  description: item.sinopsis_buku,
+                  id: item.id,
+                  title: item.title,
+                  author: item.author,
+                  synopsis: item.synopsis,
                   handleEdit: this.handleEdit
                 })}
         onLongPress={() => Alert.alert(
@@ -215,7 +222,7 @@ export default class HomeScreen extends Component {
           'Delete this book?',
           [
             {text: 'Cancel', onPress: () => null},
-            {text: 'OK', onPress: () => this.handleDelete(item.id_buku, index)},
+            {text: 'OK', onPress: () => this.handleDelete(item.id, index)},
           ],
           { cancelable: false }
         )}
@@ -224,16 +231,16 @@ export default class HomeScreen extends Component {
           <Thumbnail style={styles.thumbnail} source={require('../../assets/img/ic_books.png')} />
         </Left>
         <Body>
-          <Text>{item.judul_buku}</Text>
-          <Text note>{item.pengarang}</Text>
-          <Text note>{item.sinopsis_buku}</Text>
+          <Text>{item.title}</Text>
+          <Text note>{item.author}</Text>
+          <Text note>{item.synopsis}</Text>
         </Body>
       </ListItem>
     )
   }
 
   render() {
-    const {title, author, description} = this.state
+    const {title, author, synopsis} = this.state
     return (
       <View style={styles.container}>
         <StatusBar

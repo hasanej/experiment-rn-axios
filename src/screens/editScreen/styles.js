@@ -17,7 +17,7 @@ export default StyleSheet.create({
   bookAuthor: {
     alignSelf: "center"
   },
-  bookDescription: {
+  bookSynopsis: {
     alignSelf: "center"
   },
   caption: {

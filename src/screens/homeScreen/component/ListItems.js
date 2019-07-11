@@ -15,7 +15,7 @@ export default class ListItems extends Component {
       <List style={styles.list}>
         <FlatList
           data={this.props.data}
-          keyExtractor={(item, index) => item.id_buku}
+          keyExtractor={(item, index) => item.id}
           ListFooterComponent={renderFooter()}
           onEndReached={handleLoadMore}
           onEndReachedThreshold={0.1}

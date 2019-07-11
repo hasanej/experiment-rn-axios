@@ -11,7 +11,7 @@ export default class AddScreen extends Component {
     this.state = {
       title: "",
       author: "",
-      description: ""
+      synopsis: ""
     }
   }
 
@@ -27,19 +27,19 @@ export default class AddScreen extends Component {
     });
   }
 
-  handleDescription = (val) => {
+  handleSynopsis = (val) => {
     this.setState({
-      description: val
+      synopsis: val
     });
   }
 
   handlePostClick = () => {
-    const {title, author, description} = this.state;
-    this.props.navigation.state.params.handlePostClick(title, author, description);
+    const {title, author, synopsis} = this.state;
+    this.props.navigation.state.params.handlePostClick(title, author, synopsis);
     this.setState({
       title: "",
       author: "",
-      description: ""
+      synopsis: ""
     });
   }
 
@@ -59,8 +59,8 @@ export default class AddScreen extends Component {
               <Input value={this.state.author} onChangeText={this.handleAuthor} required />
             </Item>
             <Item floatingLabel>
-              <Label>Description</Label>
-              <Input value={this.state.description} onChangeText={this.handleDescription} required />
+              <Label>Synopsis</Label>
+              <Input value={this.state.synopsis} onChangeText={this.handleSynopsis} required />
             </Item>
           </Form>
         </Content>
